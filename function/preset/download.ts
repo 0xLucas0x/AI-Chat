@@ -15,9 +15,6 @@ interface GithubPreset {
   filename: string;
 }
 
-const GITHUB_API_URL = "https://api.github.com/repos/AI Chat/Preset/contents";
-const GITHUB_REPO_URL = "https://raw.githubusercontent.com/AI Chat/Preset/main";
-
 const AVAILABLE_PRESETS: GithubPreset[] = [
   {
     name: "mirror_realm",

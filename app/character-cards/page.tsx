@@ -248,7 +248,7 @@ export default function CharacterCards() {
     setIsDownloadingPresets(true);
     try {
       // Fetch available character files from GitHub
-      const response = await fetch("https://api.github.com/repos/AI Chat/Character-Card/contents");
+      const response = await fetch("https://api.github.com/repos/xsh00/Narratium_CharacterCards/contents");
       const data = await response.json();
       
       if (!Array.isArray(data)) {
@@ -272,7 +272,7 @@ export default function CharacterCards() {
       // Download and import each preset character
       for (const file of pngFiles) {
         try {
-          const fileResponse = await fetch(file.download_url || `https://raw.githubusercontent.com/AI Chat/Character-Card/main/${file.name}`);
+          const fileResponse = await fetch(file.download_url || `https://api.github.com/repos/xsh00/Narratium_CharacterCards/contents/main/${file.name}`);
           if (!fileResponse.ok) {
             console.error(`Failed to download ${file.name}`);
             showErrorToast(`Failed to download ${file.name}`);

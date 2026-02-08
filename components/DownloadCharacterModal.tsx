@@ -34,8 +34,8 @@ import { handleCharacterUpload } from "@/function/character/import";
 import { useLanguage } from "@/app/i18n";
 import { Toast } from "@/components/Toast";
 
-const GITHUB_API_URL = "https://api.github.com/repos/AI Chat/Character-Card/contents";
-const RAW_BASE_URL = "https://raw.githubusercontent.com/AI Chat/Character-Card/main/";
+const GITHUB_API_URL = "https://api.github.com/repos/xsh00/Narratium_CharacterCards/contents";
+const RAW_BASE_URL = "https://raw.githubusercontent.com/xsh00/Narratium_CharacterCards/main/";
 
 // Cache configuration
 const CACHE_KEY = "aichat_character_files";
