@@ -28,26 +28,3 @@ export function isUpdateAvailable(current: string, latest: string): boolean {
   
   return false;
 }
-
-/**
- * Fetch the latest release information from GitHub API
- * @returns Promise<{version: string, url: string} | null>
- */
-export async function fetchLatestRelease(): Promise<{version: string, url: string} | null> {
-  try {
-    const response = await fetch("https://api.github.com/repos/AI Chat/AI Chat.ai/releases/latest");
-    if (!response.ok) {
-      console.warn("Failed to fetch latest release info");
-      return null;
-    }
-    
-    const data = await response.json();
-    return {
-      version: data.tag_name,
-      url: data.html_url,
-    };
-  } catch (error) {
-    console.warn("Error fetching latest release:", error);
-    return null;
-  }
-} 

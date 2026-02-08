@@ -23,7 +23,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/app/i18n";
 import { motion } from "framer-motion";
 import ImportCharacterModal from "@/components/ImportCharacterModal";
@@ -76,6 +76,7 @@ export default function CharacterCards() {
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isDownloadingPresets, setIsDownloadingPresets] = useState(false);
+  const hasAutoDownloadedPresets = useRef(false);
   
   // ErrorToast state
   const [errorToast, setErrorToast] = useState({
@@ -257,16 +258,45 @@ export default function CharacterCards() {
         return;
       }
 
-      // Define specific preset character files to download
-      const presetCharacterNames = [
-        "《致炽焰以战歌》(二次元)(同人、二创).png",
-        "为美好的世界献上祝福恋爱角色扮演--纯爱，同人二创(同人、二创).png",
-        "在地下城寻求邂逅是否搞错了什么（拓展神明扮演）--纯爱，系统工具(玄幻、同人、二创).png",
+      // Match preset cards by exact names first, then by keywords as fallback
+      const presetMatchers = [
+        {
+          exactNames: [
+            "《致炽焰以战歌》(二次元)(同人、二创).png",
+            "《致炽焰以战歌》——露帕.png",
+          ],
+          keywords: ["致炽焰以战歌"],
+        },
+        {
+          exactNames: [
+            "为美好的世界献上祝福恋爱角色扮演--纯爱，同人二创(同人、二创).png",
+            "为美好的世界献上祝福恋爱角色扮演--纯爱，同人二创.png",
+          ],
+          keywords: ["为美好的世界献上祝福恋爱角色扮演"],
+        },
+        {
+          exactNames: [
+            "在地下城寻求邂逅是否搞错了什么（拓展神明扮演）--纯爱，系统工具(玄幻、同人、二创).png",
+            "在地下城寻求邂逅是否搞错了什么（拓展神明扮演）--纯爱，系统工具.png",
+          ],
+          keywords: ["在地下城寻求邂逅是否搞错了什么", "拓展神明扮演"],
+        },
       ];
 
-      // Filter and find the specific preset characters
-      const pngFiles = data.filter((item: any) => 
-        item.name.endsWith(".png") && presetCharacterNames.includes(item.name),
+      const availablePngFiles = data.filter((item: any) => item.name?.endsWith(".png"));
+
+      const matchedPresetFiles = presetMatchers
+        .map((matcher) =>
+          availablePngFiles.find((file: any) =>
+            matcher.exactNames.includes(file.name) ||
+            matcher.keywords.every((keyword) => file.name.includes(keyword)),
+          ),
+        )
+        .filter((file): file is any => Boolean(file));
+
+      // Remove duplicates in case multiple matchers hit the same file
+      const pngFiles = Array.from(
+        new Map(matchedPresetFiles.map((file) => [file.name, file])).values(),
       );
 
       // Download and import each preset character
@@ -317,12 +347,17 @@ export default function CharacterCards() {
 
   // Check if this is the first visit and auto-download preset characters
   useEffect(() => {
+    if (hasAutoDownloadedPresets.current) {
+      return;
+    }
+
     const isFirstVisit = localStorage.getItem("characterCardsFirstVisit") !== "false";
     
     // Auto-download preset characters if:
     // 1. It's the first visit, OR
     // 2. Character list is empty (regardless of first visit status)
     if ((isFirstVisit || characters.length === 0) && characters.length === 0 && !isLoading && !isDownloadingPresets) {
+      hasAutoDownloadedPresets.current = true;
       downloadPresetCharacters();
     }
   }, [characters.length, isLoading, isDownloadingPresets]);
